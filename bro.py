@@ -46,8 +46,8 @@ while True:
         print("Input invalido. Inserisci un valido input numerico.")
 
 # Create a grid of points for electric field calculation
-x = np.linspace(-3, 3, 20)
-y = np.linspace(-3, 3, 20)
+x = np.linspace(min_x - 2, max_x + 2, 20)
+y = np.linspace(min_x - 2, max_x + 2, 20)
 X, Y = np.meshgrid(x, y)
 
 # Calculate the electric field
@@ -77,34 +77,61 @@ for i in range(len(charges)):
             else:
                 polygon_vectors[i] -= r / r_mag * abs(charges[i])
 
+# Define colors for charges and vectors
+charge_colors = ['red' if q > 0 else 'blue' for q in charges]
+
+# Determine the maximum and minimum coordinates
+max_x = max([pos[0] for pos in positions])
+min_x = min([pos[0] for pos in positions])
+max_y = max([pos[1] for pos in positions])
+min_y = min([pos[1] for pos in positions])
+
+# Calculate the shift for charge labels based on the graph size
+label_shift_x = (max_x - min_x) * 0.04
+label_shift_y = (max_y - min_y) * 0.04
+
 # Plot the electric potential as contours
 plt.figure(figsize=(8, 8))
-plt.subplot(2, 1, 1)  # Create the upper subplot
+plt.subplot(2, 2, 1)  # Create the upper subplot
 plt.contour(X, Y, V, cmap='viridis', levels=20)
 for i, (q, pos) in enumerate(zip(charges, positions)):
-    plt.scatter(pos[0], pos[1], c='red', marker='o', s=200, label=f'q{i+1} = {q} C')
-    plt.text(pos[0], pos[1], f'q{i+1}', fontsize=12, ha='center', va='bottom')
+    plt.scatter(pos[0], pos[1], c=['red' if q > 0 else 'blue'], marker='o', s=200, label=f'q{i+1} = {q} C')
+    plt.text(pos[0] + label_shift_x, pos[1] - label_shift_y, f'q{i+1}', fontsize=12, ha='center', va='bottom')
 plt.xlabel('X (metri)')
 plt.ylabel('Y (metri)')
 plt.title('Linee equipotenti')
-plt.xlim(-3, 3)
-plt.ylim(-3, 3)
+plt.xlim(min_x - 2, max_x + 2)
+plt.ylim(min_y - 2, max_y + 2)
 plt.legend()
 plt.grid(True)
 
 # Create a separate subplot for the polygon vectors
-plt.subplot(2, 1, 2)  # Create the lower subplot
+plt.subplot(2, 2, 2)  # Create the lower subplot
 for i in range(len(charges)):
     plt.quiver(positions[i][0], positions[i][1], polygon_vectors[i][0], polygon_vectors[i][1],
-               angles='xy', scale_units='xy', scale=1, color='b', width=0.005, headwidth=10, headlength=10)
-    plt.scatter(positions[i][0], positions[i][1], c='red', marker='o', s=200, label=f'q{i+1} = {charges[i]} C')
-    plt.text(positions[i][0], positions[i][1], f'q{i+1}', fontsize=12, ha='center', va='bottom')
+               angles='xy', scale_units='xy', scale=1, color='green', width=0.005, headwidth=10, headlength=10)
+    plt.scatter(positions[i][0], positions[i][1], c=['red' if q > 0 else 'blue' for q in charges][i], marker='o', s=200, label=f'q{i+1} = {charges[i]} C')
+    plt.text(positions[i][0] + label_shift_x, positions[i][1] - label_shift_y, f'q{i+1}', fontsize=12, ha='center', va='bottom')
 plt.xlabel('X (metri)')
 plt.ylabel('Y (metri)')
 plt.title('Vettori')
-plt.xlim(-3, 3)
-plt.ylim(-3, 3)
+plt.xlim(min_x - 2, max_x + 2)
+plt.ylim(min_y - 2, max_y + 2)
 plt.legend()
+plt.grid(True)
+
+# Create a separate subplot for electric field lines with arrowheads
+plt.subplot(2, 2, 3)  # Create the lower-left subplot
+plt.streamplot(X, Y, Ex, Ey, color='green', linewidth=1, density=.5, arrowstyle='->', arrowsize=1.5)
+for i, (q, pos) in enumerate(zip(charges, positions)):
+    plt.scatter(pos[0], pos[1], c=['red' if q > 0 else 'blue'], marker='o', s=200, label=f'q{i+1} = {q} C')
+    plt.text(pos[0] + label_shift_x, pos[1] - label_shift_y, f'q{i+1}', fontsize=12, ha='center', va='bottom')
+plt.xlabel('X (metri)')
+plt.ylabel('Y (metri)')
+plt.title('Linee di campo elettrico')
+plt.xlim(min_x - 2, max_x + 2)
+plt.ylim(min_y - 2, max_y + 2)
+plt.legend(loc='upper right')
 plt.grid(True)
 
 plt.tight_layout()  # Ensure the subplots don't overlap
