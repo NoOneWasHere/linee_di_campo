@@ -45,9 +45,22 @@ while True:
     except ValueError:
         print("Input invalido. Inserisci un valido input numerico.")
 
+# Determine the maximum and minimum coordinates
+max_x = max([pos[0] for pos in positions])
+min_x = min([pos[0] for pos in positions])
+max_y = max([pos[1] for pos in positions])
+min_y = min([pos[1] for pos in positions])
+
+# Calculate the range based on the maximum and minimum coordinates of charges
+x_range = max_x - min_x
+y_range = max_y - min_y
+
+# Calculate the scale factor based on charge coordinates
+scale_factor = 0.2 * max(x_range, y_range)
+
 # Create a grid of points for electric field calculation
-x = np.linspace(min_x - 2, max_x + 2, 20)
-y = np.linspace(min_x - 2, max_x + 2, 20)
+x = np.linspace(min_x - scale_factor, max_x + scale_factor, 20)
+y = np.linspace(min_y - scale_factor, max_y + scale_factor, 20)
 X, Y = np.meshgrid(x, y)
 
 # Calculate the electric field
@@ -80,12 +93,6 @@ for i in range(len(charges)):
 # Define colors for charges and vectors
 charge_colors = ['red' if q > 0 else 'blue' for q in charges]
 
-# Determine the maximum and minimum coordinates
-max_x = max([pos[0] for pos in positions])
-min_x = min([pos[0] for pos in positions])
-max_y = max([pos[1] for pos in positions])
-min_y = min([pos[1] for pos in positions])
-
 # Calculate the shift for charge labels based on the graph size
 label_shift_x = (max_x - min_x) * 0.04
 label_shift_y = (max_y - min_y) * 0.04
@@ -99,9 +106,9 @@ for i, (q, pos) in enumerate(zip(charges, positions)):
     plt.text(pos[0] + label_shift_x, pos[1] - label_shift_y, f'q{i+1}', fontsize=12, ha='center', va='bottom')
 plt.xlabel('X (metri)')
 plt.ylabel('Y (metri)')
-plt.title('Linee equipotenti')
-plt.xlim(min_x - 2, max_x + 2)
-plt.ylim(min_y - 2, max_y + 2)
+plt.title('Superfici equipotenziali')
+plt.xlim(min_x - scale_factor, max_x + scale_factor)
+plt.ylim(min_y - scale_factor, max_y + scale_factor)
 plt.legend()
 plt.grid(True)
 
@@ -115,8 +122,8 @@ for i in range(len(charges)):
 plt.xlabel('X (metri)')
 plt.ylabel('Y (metri)')
 plt.title('Vettori')
-plt.xlim(min_x - 2, max_x + 2)
-plt.ylim(min_y - 2, max_y + 2)
+plt.xlim(min_x - scale_factor, max_x + scale_factor)
+plt.ylim(min_y - scale_factor, max_y + scale_factor)
 plt.legend()
 plt.grid(True)
 
@@ -129,8 +136,8 @@ for i, (q, pos) in enumerate(zip(charges, positions)):
 plt.xlabel('X (metri)')
 plt.ylabel('Y (metri)')
 plt.title('Linee di campo elettrico')
-plt.xlim(min_x - 2, max_x + 2)
-plt.ylim(min_y - 2, max_y + 2)
+plt.xlim(min_x - scale_factor, max_x + scale_factor)
+plt.ylim(min_y - scale_factor, max_y + scale_factor)
 plt.legend(loc='upper right')
 plt.grid(True)
 
